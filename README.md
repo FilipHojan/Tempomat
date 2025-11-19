@@ -61,6 +61,112 @@ Tempomat/
 
 ---
 
+## Diagram połączeń modułów (architektura projektu)
+
+Poniższy diagram pokazuje, jak pliki `.py` komunikują się między sobą
+oraz jakie dane przepływają przez system:
+
+```
+                       +----------------+
+                       |   main.py     |
+                       |----------------|
+                       | uruchamia GUI |
+                       +-------+--------+
+                               |
+                               v
+                       +----------------+
+                       |    ui.py       |
+                       |----------------|
+                       | zbiera dane od |
+                       | użytkownika    |
+                       | wywołuje       |
+                       | simulation.py  |
+                       +--+----------+--+
+                          |          |
+        wybór regulatora  |          |  wybór pojazdu
+                          |          |
+             +------------+          +---------------+
+             |                                          
+             v                                           v
+   +----------------------+                    +----------------------+
+   | pid_controller.py    |                    |  fuzzy_controller.py |
+   |-----------------------|                    |----------------------|
+   | oblicza sterowanie u |                    | oblicza sterowanie u |
+   +-----------+-----------+                    +-----------+----------+
+               |                                            |
+               +------------------+--------------------------+
+                                  |
+                            uchyb e, dt
+                                  |
+                                  v
+                       +----------------------+
+                       |   simulation.py      |
+                       |----------------------|
+                       | łączy regulator z    |
+                       | modelem pojazdu      |
+                       | generuje:            |
+                       | - prędkość v(t)      |
+                       | - sterowanie u(t)    |
+                       | - zadanie v_set(t)   |
+                       +----------+-----------+
+                                  |
+                                  |
+                          sterowanie u
+                                  |
+                                  v
+                      +-----------------------+
+                      |     car_plant.py      |
+                      |------------------------|
+                      | model pojazdu:         |
+                      | - Ferrari              |
+                      | - Motocykl            |
+                      | - Czołg               |
+                      | oblicza v(t+dt)        |
+                      | na podstawie u(t)      |
+                      +-----------+------------+
+                                  |
+                           nowa prędkość v
+                                  |
+                                  v
+                       +-----------------------+
+                       |       ui.py           |
+                       |-----------------------|
+                       | rysuje wykresy        |
+                       +-----------------------+
+```
+
+### Wyjaśnienie przepływu danych:
+
+- **main.py → ui.py**  
+  Main uruchamia interfejs graficzny.
+
+- **ui.py → simulation.py**  
+  UI przekazuje:  
+  - prędkość zadaną,  
+  - czas symulacji,  
+  - typ regulatora,  
+  - model pojazdu.  
+
+- **simulation.py → pid_controller.py / fuzzy_controller.py**  
+  Przekazuje uchyb **e = v_set – v** oraz krok czasu **dt**.  
+  Regulator zwraca **u(t)**.
+
+- **simulation.py → car_plant.py**  
+  Przekazuje sygnał sterujący **u(t)**.  
+  Model pojazdu zwraca nową prędkość **v(t+dt)**.
+
+- **simulation.py → ui.py**  
+  GUI otrzymuje tablice:
+  - prędkości,
+  - sterowania,
+  - czasu,
+  - wartości zadanej  
+  i rysuje wykresy.
+
+Ten diagram pokazuje pełny przepływ informacji i zależności między plikami.
+
+
+
 # Opis plików
 
 ### main.py
