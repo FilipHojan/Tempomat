@@ -1,19 +1,16 @@
-```markdown
 # Tempomat – PID & Regulator Rozmyty  
 **Symulacja sterowania prędkością dla różnych modeli pojazdów (Ferrari, Motocykl, Czołg)**  
 Projekt w Pythonie z GUI (Tkinter + Matplotlib)
 
----
-
 ## Jak uruchomić projekt
 
 ### 1. Zainstaluj wymagane biblioteki:
-```bash
+
 pip install matplotlib
 ```
 
 ### 2. Uruchom aplikację:
-```bash
+
 python main.py
 ```
 
