@@ -68,9 +68,9 @@ oraz jakie dane przepływają przez system:
 
 ```
                        +----------------+
-                       |   main.py     |
+                       |   main.py      |
                        |----------------|
-                       | uruchamia GUI |
+                       | uruchamia GUI  |
                        +-------+--------+
                                |
                                v
@@ -85,14 +85,14 @@ oraz jakie dane przepływają przez system:
                           |          |
         wybór regulatora  |          |  wybór pojazdu
                           |          |
-             +------------+          +---------------+
-             |                                          
+             +------------+          +-------------------+
+             |                                           |
              v                                           v
    +----------------------+                    +----------------------+
    | pid_controller.py    |                    |  fuzzy_controller.py |
-   |-----------------------|                    |----------------------|
+   |----------------------|                    |----------------------|
    | oblicza sterowanie u |                    | oblicza sterowanie u |
-   +-----------+-----------+                    +-----------+----------+
+   +-----------+----------+                    +-----------+----------+
                |                                            |
                +------------------+--------------------------+
                                   |
@@ -114,13 +114,13 @@ oraz jakie dane przepływają przez system:
                           sterowanie u
                                   |
                                   v
-                      +-----------------------+
-                      |     car_plant.py      |
+                      +------------------------+
+                      |     car_plant.py       |
                       |------------------------|
                       | model pojazdu:         |
                       | - Ferrari              |
-                      | - Motocykl            |
-                      | - Czołg               |
+                      | - Motocykl             |
+                      | - Czołg                |
                       | oblicza v(t+dt)        |
                       | na podstawie u(t)      |
                       +-----------+------------+
