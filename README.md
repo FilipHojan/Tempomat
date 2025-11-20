@@ -67,72 +67,70 @@ Poniższy diagram pokazuje, jak pliki `.py` komunikują się między sobą
 oraz jakie dane przepływają przez system:
 
 ```
-                       +----------------+
-                       |   main.py      |
-                       |----------------|
-                       | uruchamia GUI  |
-                       +-------+--------+
-                               |
-                               v
-                       +----------------+
-                       |    ui.py       |
-                       |----------------|
-                       | zbiera dane od |
-                       | użytkownika    |
-                       | wywołuje       |
-                       | simulation.py  |
-                       +--+----------+--+
-                          |          |
-        wybór regulatora  |          |  wybór pojazdu
-                          |          |
-             +------------+          +-------------------+
-             |                                           |
-             v                                           v
-   +----------------------+                    +----------------------+
-   | pid_controller.py    |                    |  fuzzy_controller.py |
-   |----------------------|                    |----------------------|
-   | oblicza sterowanie u |                    | oblicza sterowanie u |
-   +-----------+----------+                    +-----------+----------+
-               |                                            |
-               +------------------+--------------------------+
-                                  |
-                            uchyb e, dt
-                                  |
-                                  v
-                       +----------------------+
-                       |   simulation.py      |
-                       |----------------------|
-                       | łączy regulator z    |
-                       | modelem pojazdu      |
-                       | generuje:            |
-                       | - prędkość v(t)      |
-                       | - sterowanie u(t)    |
-                       | - zadanie v_set(t)   |
-                       +----------+-----------+
-                                  |
-                                  |
-                          sterowanie u
-                                  |
-                                  v
-                      +------------------------+
-                      |     car_plant.py       |
-                      |------------------------|
-                      | model pojazdu:         |
-                      | - Ferrari              |
-                      | - Motocykl             |
-                      | - Czołg                |
-                      | oblicza v(t+dt)        |
-                      | na podstawie u(t)      |
-                      +-----------+------------+
-                                  |
-                           nowa prędkość v
-                                  |
-                                  v
-                       +-----------------------+
-                       |       ui.py           |
-                       |-----------------------|
-                       | rysuje wykresy        |
-                       +-----------------------+
++----------------+
+|    main.py     |
+|----------------|
+| uruchamia GUI  |
++--------+-------+
+         |
+         v
++-----------------------------+
+|           ui.py             |
+|-----------------------------|
+| - zbiera dane od usera      |
+| - wybór pojazdu             |
+| - wybór regulatora          |
+| - wywołuje simulation.py    |
+| - rysuje wykresy            |
++----+------------------+-----+
+     |                  |
+     | wybór pojazdu    | wybór regulatora
+     v                  v
++----------------+    +------------------------+
+|  car_plant.py  |    |  pid_controller.py     |
+|----------------|    |------------------------|
+| create_vehicle |    | PIDController          |
+|  -> Ferrari    |    +------------------------+
+|  -> Motocykl   |                ^
+|  -> Czołg      |                |
++--------+-------+                |
+         |                        |
+         |                        |
+         |                  +------------------------+
+         |                  | fuzzy_controller.py    |
+         |                  |------------------------|
+         |                  | FuzzyCruiseController  |
+         |                  +------------------------+
+         |                        ^
+         +------------+-----------+
+                      |
+                      | (ui.py przekazuje)
+                      |  - obiekt vehicle
+                      |  - obiekt controller (PID / Fuzzy)
+                      |  - v_set, t_sim, dt
+                      v
+               +--------------------+
+               |    simulation.py   |
+               |--------------------|
+               | pętla po czasie:   |
+               |  1) v = vehicle.v  |
+               |  2) e = v_set - v  |
+               |  3) u = controller.|
+               |        step(e,dt)  |
+               |  4) v = vehicle.   |
+               |        step(u,dt)  |
+               |  zapis: t,v,u,vset |
+               +----------+---------+
+                          |
+                          | (zwraca tablice t, v, u, v_set)
+                          v
+                     +----------+
+                     |  ui.py   |
+                     |----------|
+                     | rysuje   |
+                     | wykresy  |
+                     +----------+
+
 ```
 
 ### Wyjaśnienie przepływu danych:
